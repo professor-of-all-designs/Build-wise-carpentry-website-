@@ -1,1189 +1,1694 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Build Wise Carpentry</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --deep-brown: #1A0A05;
-    --dark-brown: #2C1810;
-    --charcoal: #1E1E1E;
-    --gold: #D4A017;
-    --gold-light: #E8C547;
-    --gold-dark: #B8860B;
-    --cream: #F5F0E8;
-    --off-white: #FAF8F5;
-    --text-muted: #A89B8C;
-    --text-light: #D4C5B5;
-  }
-
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-  }
-
-  html {
-    scroll-behavior: smooth;
-  }
-
-  body {
-    font-family: 'Inter', sans-serif;
-    color: var(--cream);
-    background: var(--deep-brown);
-    line-height: 1.6;
-    overflow-x: hidden;
-  }
-
-  /* ===== MODAL / POPUP ===== */
-  .modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.7);
-    backdrop-filter: blur(8px);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    z-index: 9999;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.4s ease;
-  }
-
-  .modal-overlay.active {
-    opacity: 1;
-    visibility: visible;
-  }
-
-  .modal-content {
-    background: linear-gradient(145deg, var(--dark-brown), var(--deep-brown));
-    border: 1px solid rgba(212, 160, 23, 0.2);
-    border-radius: 12px;
-    padding: 2.5rem 2rem;
-    max-width: 420px;
-    width: 90%;
-    text-align: center;
-    position: relative;
-    transform: scale(0.9) translateY(20px);
-    transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-    box-shadow: 0 25px 50px rgba(0,0,0,0.5), 0 0 0 1px rgba(212, 160, 23, 0.1);
-  }
-
-  .modal-overlay.active .modal-content {
-    transform: scale(1) translateY(0);
-  }
-
-  .modal-icon {
-    width: 64px;
-    height: 64px;
-    margin: 0 auto 1.5rem;
-    background: linear-gradient(135deg, rgba(212, 160, 23, 0.15), rgba(212, 160, 23, 0.05));
-    border: 2px solid rgba(212, 160, 23, 0.3);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .modal-icon svg {
-    width: 32px;
-    height: 32px;
-    color: var(--gold);
-  }
-
-  .modal-content h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.5rem;
-    color: var(--cream);
-    margin-bottom: 0.75rem;
-  }
-
-  .modal-content p {
-    color: var(--text-muted);
-    font-size: 0.95rem;
-    margin-bottom: 1.5rem;
-    line-height: 1.6;
-  }
-
-  .modal-btn {
-    display: inline-block;
-    padding: 0.875rem 2.5rem;
-    background: var(--gold);
-    color: var(--deep-brown);
-    border: none;
-    border-radius: 6px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 600;
-    font-size: 0.9rem;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .modal-btn:hover {
-    background: var(--gold-light);
-    transform: translateY(-2px);
-    box-shadow: 0 8px 20px rgba(212, 160, 23, 0.3);
-  }
-
-  /* Hero Section */
-  .hero {
-    position: relative;
-    min-height: 100vh;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: linear-gradient(160deg, var(--deep-brown) 0%, var(--dark-brown) 40%, #0D0503 100%);
-    overflow: hidden;
-  }
-
-  .hero::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: 
-      linear-gradient(135deg, transparent 40%, rgba(212, 160, 23, 0.03) 40%, rgba(212, 160, 23, 0.03) 42%, transparent 42%),
-      linear-gradient(225deg, transparent 60%, rgba(212, 160, 23, 0.03) 60%, rgba(212, 160, 23, 0.03) 62%, transparent 62%);
-  }
-
-  .hero-accent-line {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
-
-  .hero-content {
-    position: relative;
-    z-index: 2;
-    text-align: center;
-    padding: 2rem;
-    max-width: 900px;
-  }
-
-  .hero-badge {
-    display: inline-block;
-    padding: 0.5rem 1.5rem;
-    border: 1px solid var(--gold);
-    color: var(--gold);
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    margin-bottom: 2rem;
-    border-radius: 2px;
-    background: rgba(212, 160, 23, 0.05);
-  }
-
-  .hero h1 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(2.5rem, 6vw, 5rem);
-    font-weight: 700;
-    color: var(--cream);
-    line-height: 1.1;
-    margin-bottom: 1rem;
-    letter-spacing: -0.02em;
-  }
-
-  .hero h1 span {
-    color: var(--gold);
-  }
-
-  .hero-subtitle {
-    font-size: clamp(1rem, 2vw, 1.25rem);
-    color: var(--text-muted);
-    font-weight: 300;
-    margin-bottom: 2.5rem;
-    letter-spacing: 0.05em;
-  }
-
-  .hero-cta {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.75rem;
-    padding: 1rem 2.5rem;
-    background: var(--gold);
-    color: var(--deep-brown);
-    text-decoration: none;
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    border-radius: 2px;
-    transition: all 0.3s ease;
-    cursor: pointer;
-    border: none;
-  }
-
-  .hero-cta:hover {
-    background: var(--gold-light);
-    transform: translateY(-2px);
-    box-shadow: 0 10px 30px rgba(212, 160, 23, 0.3);
-  }
-
-  .hero-cta svg {
-    width: 18px;
-    height: 18px;
-    transition: transform 0.3s ease;
-  }
-
-  .hero-cta:hover svg {
-    transform: translateX(4px);
-  }
-
-  .hero-scroll {
-    position: absolute;
-    bottom: 2rem;
-    left: 50%;
-    transform: translateX(-50%);
-    color: var(--text-muted);
-    font-size: 0.75rem;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    animation: bounce 2s infinite;
-  }
-
-  @keyframes bounce {
-    0%, 20%, 50%, 80%, 100% { transform: translateX(-50%) translateY(0); }
-    40% { transform: translateX(-50%) translateY(-10px); }
-    60% { transform: translateX(-50%) translateY(-5px); }
-  }
-
-  /* About Section */
-  .about {
-    padding: 6rem 2rem;
-    background: var(--dark-brown);
-    position: relative;
-  }
-
-  .about::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
-  }
-
-  .about-inner {
-    max-width: 1100px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-  }
-
-  .about-label {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
-
-  .about h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    color: var(--cream);
-    margin-bottom: 1.5rem;
-    line-height: 1.2;
-  }
-
-  .about p {
-    color: var(--text-muted);
-    font-size: 1.05rem;
-    line-height: 1.8;
-    margin-bottom: 1.5rem;
-  }
-
-  .about-visual {
-    position: relative;
-    height: 400px;
-    background: linear-gradient(145deg, var(--deep-brown), #0D0503);
-    border-radius: 4px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    overflow: hidden;
-    border: 1px solid rgba(212, 160, 23, 0.1);
-  }
-
-  .about-visual::before {
-    content: '';
-    position: absolute;
-    width: 200%;
-    height: 200%;
-    background: repeating-linear-gradient(
-      45deg,
-      transparent,
-      transparent 10px,
-      rgba(212, 160, 23, 0.03) 10px,
-      rgba(212, 160, 23, 0.03) 20px
-    );
-    animation: slide 20s linear infinite;
-  }
-
-  @keyframes slide {
-    0% { transform: translate(-50%, -50%); }
-    100% { transform: translate(0, 0); }
-  }
-
-  .about-visual-icon {
-    position: relative;
-    z-index: 2;
-    width: 80px;
-    height: 80px;
-    color: var(--gold);
-    opacity: 0.8;
-  }
-
-  /* ===== GALLERY SECTION ===== */
-  .gallery {
-    padding: 5rem 0;
-    background: var(--deep-brown);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .gallery::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
-  }
-
-  .gallery-header {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 3rem;
-    padding: 0 2rem;
-  }
-
-  .gallery-header .label {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 600;
-    margin-bottom: 1rem;
-    display: block;
-  }
-
-  .gallery-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    color: var(--cream);
-    margin-bottom: 1rem;
-  }
-
-  .gallery-header p {
-    color: var(--text-muted);
-    font-size: 1rem;
-  }
-
-  .gallery-scroll-container {
-    position: relative;
-    padding: 0 2rem;
-  }
-
-  .gallery-scroll {
-    display: flex;
-    gap: 1.25rem;
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    scroll-behavior: smooth;
-    padding: 1rem 0.5rem 2rem;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: thin;
-    scrollbar-color: var(--gold) transparent;
-  }
-
-  .gallery-scroll::-webkit-scrollbar {
-    height: 6px;
-  }
-
-  .gallery-scroll::-webkit-scrollbar-track {
-    background: rgba(212, 160, 23, 0.05);
-    border-radius: 3px;
-  }
-
-  .gallery-scroll::-webkit-scrollbar-thumb {
-    background: var(--gold);
-    border-radius: 3px;
-  }
-
-  .gallery-item {
-    flex: 0 0 auto;
-    scroll-snap-align: start;
-    width: 300px;
-    height: 220px;
-    border-radius: 8px;
-    overflow: hidden;
-    border: 1px solid rgba(212, 160, 23, 0.1);
-    transition: all 0.4s ease;
-    position: relative;
-  }
-
-  .gallery-item:hover {
-    transform: translateY(-6px);
-    box-shadow: 0 15px 35px rgba(0,0,0,0.4);
-    border-color: rgba(212, 160, 23, 0.3);
-  }
-
-  .gallery-item img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-
-  .gallery-item:hover img {
-    transform: scale(1.08);
-  }
-
-  .gallery-nav {
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    margin-top: 1rem;
-  }
-
-  .gallery-nav-btn {
-    width: 44px;
-    height: 44px;
-    border-radius: 50%;
-    border: 1px solid rgba(212, 160, 23, 0.3);
-    background: rgba(212, 160, 23, 0.05);
-    color: var(--gold);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .gallery-nav-btn:hover {
-    background: var(--gold);
-    color: var(--deep-brown);
-    border-color: var(--gold);
-  }
-
-  .gallery-nav-btn svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  /* Services Section */
-  .services {
-    padding: 6rem 2rem;
-    background: var(--deep-brown);
-    position: relative;
-  }
-
-  .services::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
-  }
-
-  .services-header {
-    text-align: center;
-    max-width: 600px;
-    margin: 0 auto 4rem;
-  }
-
-  .services-header .label {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 600;
-    margin-bottom: 1rem;
-    display: block;
-  }
-
-  .services-header h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    color: var(--cream);
-    margin-bottom: 1rem;
-  }
-
-  .services-header p {
-    color: var(--text-muted);
-    font-size: 1rem;
-  }
-
-  .services-grid {
-    max-width: 1200px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1.5rem;
-  }
-
-  .service-card {
-    background: rgba(30, 20, 15, 0.6);
-    border-radius: 8px;
-    border: 1px solid rgba(212, 160, 23, 0.08);
-    transition: all 0.4s ease;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .service-card::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 3px;
-    background: var(--gold);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s ease;
-    z-index: 2;
-  }
-
-  .service-card:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 20px 40px rgba(0,0,0,0.3);
-    border-color: rgba(212, 160, 23, 0.2);
-  }
-
-  .service-card:hover::before {
-    transform: scaleX(1);
-  }
-
-  .service-image {
-    width: 100%;
-    height: 200px;
-    overflow: hidden;
-    position: relative;
-  }
-
-  .service-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.5s ease;
-  }
-
-  .service-card:hover .service-image img {
-    transform: scale(1.08);
-  }
-
-  .service-image::after {
-    content: '';
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 60px;
-    background: linear-gradient(transparent, rgba(30, 20, 15, 0.9));
-  }
-
-  .service-body {
-    padding: 1.5rem 1.75rem 2rem;
-  }
-
-  .service-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.25rem;
-    color: var(--cream);
-    margin-bottom: 0.75rem;
-  }
-
-  .service-card p {
-    color: var(--text-muted);
-    font-size: 0.9rem;
-    line-height: 1.6;
-  }
-
-  /* Contact Section */
-  .contact {
-    padding: 6rem 2rem;
-    background: linear-gradient(180deg, var(--dark-brown) 0%, var(--deep-brown) 100%);
-    color: var(--cream);
-    position: relative;
-    overflow: hidden;
-  }
-
-  .contact::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
-  }
-
-  .contact::after {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -20%;
-    width: 600px;
-    height: 600px;
-    background: radial-gradient(circle, rgba(212, 160, 23, 0.06) 0%, transparent 70%);
-    border-radius: 50%;
-  }
-
-  .contact-inner {
-    max-width: 1000px;
-    margin: 0 auto;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 4rem;
-    align-items: center;
-    position: relative;
-    z-index: 2;
-  }
-
-  .contact-label {
-    font-size: 0.75rem;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 600;
-    margin-bottom: 1rem;
-  }
-
-  .contact h2 {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(1.8rem, 3vw, 2.5rem);
-    color: var(--cream);
-    margin-bottom: 1.5rem;
-  }
-
-  .contact-desc {
-    color: var(--text-muted);
-    font-size: 1.05rem;
-    line-height: 1.8;
-    margin-bottom: 2.5rem;
-  }
-
-  .contact-item {
-    display: flex;
-    align-items: flex-start;
-    gap: 1rem;
-    margin-bottom: 1.5rem;
-  }
-
-  .contact-item-icon {
-    width: 44px;
-    height: 44px;
-    background: rgba(212, 160, 23, 0.1);
-    border: 1px solid rgba(212, 160, 23, 0.2);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-    color: var(--gold);
-  }
-
-  .contact-item-icon svg {
-    width: 20px;
-    height: 20px;
-  }
-
-  .contact-item-info h4 {
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    color: var(--gold);
-    margin-bottom: 0.25rem;
-    font-weight: 500;
-  }
-
-  .contact-item-info a,
-  .contact-item-info span {
-    color: var(--cream);
-    text-decoration: none;
-    font-size: 1.1rem;
-    font-weight: 500;
-    transition: color 0.3s ease;
-  }
-
-  .contact-item-info a:hover {
-    color: var(--gold);
-  }
-
-  .contact-form-card {
-    background: rgba(20, 10, 5, 0.5);
-    border: 1px solid rgba(212, 160, 23, 0.1);
-    border-radius: 8px;
-    padding: 2.5rem;
-    backdrop-filter: blur(10px);
-  }
-
-  .contact-form-card h3 {
-    font-family: 'Playfair Display', serif;
-    font-size: 1.3rem;
-    color: var(--cream);
-    margin-bottom: 1.5rem;
-  }
-
-  .form-group {
-    margin-bottom: 1.25rem;
-  }
-
-  .form-group label {
-    display: block;
-    font-size: 0.8rem;
-    letter-spacing: 0.05em;
-    text-transform: uppercase;
-    color: var(--text-muted);
-    margin-bottom: 0.5rem;
-  }
-
-  .form-group input,
-  .form-group textarea {
-    width: 100%;
-    padding: 0.875rem 1rem;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(212, 160, 23, 0.15);
-    border-radius: 4px;
-    color: var(--cream);
-    font-family: 'Inter', sans-serif;
-    font-size: 0.95rem;
-    transition: all 0.3s ease;
-  }
-
-  .form-group input:focus,
-  .form-group textarea:focus {
-    outline: none;
-    border-color: var(--gold);
-    background: rgba(255, 255, 255, 0.06);
-  }
-
-  .form-group input::placeholder,
-  .form-group textarea::placeholder {
-    color: rgba(168, 155, 140, 0.4);
-  }
-
-  .form-group textarea {
-    min-height: 120px;
-    resize: vertical;
-  }
-
-  .form-submit {
-    width: 100%;
-    padding: 1rem;
-    background: var(--gold);
-    color: var(--deep-brown);
-    border: none;
-    border-radius: 4px;
-    font-family: 'Inter', sans-serif;
-    font-weight: 700;
-    font-size: 0.9rem;
-    letter-spacing: 0.05em;
-    cursor: pointer;
-    transition: all 0.3s ease;
-  }
-
-  .form-submit:hover {
-    background: var(--gold-light);
-    transform: translateY(-1px);
-    box-shadow: 0 8px 20px rgba(212, 160, 23, 0.2);
-  }
-
-  /* Footer */
-  .footer {
-    padding: 2.5rem 2rem;
-    background: #0D0503;
-    text-align: center;
-    border-top: 1px solid rgba(212, 160, 23, 0.1);
-  }
-
-  .footer p {
-    color: var(--text-muted);
-    font-size: 0.85rem;
-    letter-spacing: 0.05em;
-  }
-
-  .footer-brand {
-    font-family: 'Playfair Display', serif;
-    color: var(--gold);
-    font-size: 1.1rem;
-    margin-bottom: 0.5rem;
-  }
-
-  .footer-bar {
-    height: 4px;
-    background: linear-gradient(90deg, transparent, var(--gold), transparent);
-  }
-
-  /* Responsive */
-  @media (max-width: 768px) {
-    .about-inner,
-    .contact-inner {
-      grid-template-columns: 1fr;
-      gap: 2rem;
-    }
-
-    .about-visual {
-      height: 250px;
-      order: -1;
-    }
-
-    .services-grid {
-      grid-template-columns: 1fr;
-    }
-
-    .contact-form-card {
-      padding: 1.5rem;
-    }
-
-    .gallery-item {
-      width: 260px;
-      height: 190px;
-    }
-
-    .modal-content {
-      padding: 2rem 1.5rem;
-    }
-  }
-</style>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Build Wise Carpentry</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        /* ── Reset & Root ── */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        :root {
+            --deep-brown: #1A0A05;
+            --dark-brown: #2C1810;
+            --charcoal: #1E1E1E;
+            --gold: #D4A017;
+            --gold-light: #E8C547;
+            --gold-dark: #B8860B;
+            --cream: #F5F0E8;
+            --off-white: #FAF8F5;
+            --text-muted: #A89B8C;
+            --text-light: #D4C5B5;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            color: var(--cream);
+            background: var(--deep-brown);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── Success Modal (Redesigned) ── */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(10, 4, 2, 0.85);
+            backdrop-filter: blur(12px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 9999;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+        }
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+        .modal-content {
+            background: linear-gradient(145deg, var(--dark-brown), var(--deep-brown));
+            border: 1px solid rgba(212, 160, 23, 0.25);
+            border-radius: 16px;
+            padding: 3rem 2.5rem;
+            max-width: 480px;
+            width: 90%;
+            text-align: center;
+            position: relative;
+            transform: scale(0.85) translateY(40px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.6), 0 0 0 1px rgba(212, 160, 23, 0.1), 0 0 40px rgba(212, 160, 23, 0.08);
+            overflow: hidden;
+        }
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+        .modal-content::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(90deg,
+                    transparent 0px,
+                    transparent 2px,
+                    rgba(212, 160, 23, 0.03) 2px,
+                    rgba(212, 160, 23, 0.03) 4px);
+            animation: grainSlide 8s linear infinite;
+            pointer-events: none;
+        }
+        @keyframes grainSlide {
+            0% {
+                transform: translateX(0);
+            }
+            100% {
+                transform: translateX(4px);
+            }
+        }
+        .modal-icon-wrap {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            z-index: 2;
+        }
+        .modal-icon-ring {
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            border: 2px solid rgba(212, 160, 23, 0.2);
+            animation: ringPulse 2s ease-in-out infinite;
+        }
+        @keyframes ringPulse {
+            0%,
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+            50% {
+                transform: scale(1.15);
+                opacity: 0.5;
+            }
+        }
+        .modal-icon {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(212, 160, 23, 0.15), rgba(212, 160, 23, 0.05));
+            border: 2px solid var(--gold);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            animation: iconPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+        }
+        @keyframes iconPop {
+            0% {
+                transform: scale(0) rotate(-180deg);
+            }
+            100% {
+                transform: scale(1) rotate(0deg);
+            }
+        }
+        .modal-icon svg {
+            width: 36px;
+            height: 36px;
+            color: var(--gold);
+            stroke-dasharray: 50;
+            stroke-dashoffset: 50;
+            animation: drawCheck 0.8s ease 0.5s forwards;
+        }
+        @keyframes drawCheck {
+            to {
+                stroke-dashoffset: 0;
+            }
+        }
+        .modal-content h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.75rem;
+            color: var(--cream);
+            margin-bottom: 0.75rem;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeUp 0.5s ease 0.4s forwards;
+        }
+        .modal-content p {
+            color: var(--text-muted);
+            font-size: 1rem;
+            margin-bottom: 2rem;
+            line-height: 1.7;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            transform: translateY(10px);
+            animation: fadeUp 0.5s ease 0.55s forwards;
+        }
+        @keyframes fadeUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .modal-actions {
+            display: flex;
+            gap: 0.75rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            position: relative;
+            z-index: 2;
+            opacity: 0;
+            animation: fadeUp 0.5s ease 0.7s forwards;
+        }
+        .modal-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.875rem 2rem;
+            background: var(--gold);
+            color: var(--deep-brown);
+            border: none;
+            border-radius: 8px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+        }
+        .modal-btn:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(212, 160, 23, 0.35);
+        }
+        .modal-btn.secondary {
+            background: transparent;
+            color: var(--gold);
+            border: 1px solid rgba(212, 160, 23, 0.3);
+        }
+        .modal-btn.secondary:hover {
+            background: rgba(212, 160, 23, 0.1);
+            border-color: var(--gold);
+        }
+        .modal-close-x {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 160, 23, 0.2);
+            background: rgba(212, 160, 23, 0.05);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            z-index: 3;
+        }
+        .modal-close-x:hover {
+            background: rgba(212, 160, 23, 0.15);
+            color: var(--gold);
+            transform: rotate(90deg);
+        }
+        .modal-close-x svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* ── Hero ── */
+        .hero {
+            position: relative;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(160deg, var(--deep-brown) 0%, var(--dark-brown) 40%, #0D0503 100%);
+            overflow: hidden;
+        }
+        .hero::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background:
+                linear-gradient(135deg, transparent 40%, rgba(212, 160, 23, 0.03) 40%, rgba(212, 160, 23, 0.03) 42%, transparent 42%),
+                linear-gradient(225deg, transparent 60%, rgba(212, 160, 23, 0.03) 60%, rgba(212, 160, 23, 0.03) 62%, transparent 62%);
+        }
+        .hero-accent-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            padding: 2rem;
+            max-width: 900px;
+        }
+        .hero-badge {
+            display: inline-block;
+            padding: 0.5rem 1.5rem;
+            border: 1px solid var(--gold);
+            color: var(--gold);
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            margin-bottom: 2rem;
+            border-radius: 2px;
+            background: rgba(212, 160, 23, 0.05);
+        }
+        .hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(2.5rem, 6vw, 5rem);
+            font-weight: 700;
+            color: var(--cream);
+            line-height: 1.1;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+        .hero h1 span {
+            color: var(--gold);
+        }
+        .hero-subtitle {
+            font-size: clamp(1rem, 2vw, 1.25rem);
+            color: var(--text-muted);
+            font-weight: 300;
+            margin-bottom: 2.5rem;
+            letter-spacing: 0.05em;
+        }
+        .hero-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 2.5rem;
+            background: var(--gold);
+            color: var(--deep-brown);
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            border-radius: 2px;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            border: none;
+        }
+        .hero-cta:hover {
+            background: var(--gold-light);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(212, 160, 23, 0.3);
+        }
+        .hero-cta svg {
+            width: 18px;
+            height: 18px;
+            transition: transform 0.3s ease;
+        }
+        .hero-cta:hover svg {
+            transform: translateX(4px);
+        }
+        .hero-scroll {
+            position: absolute;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%);
+            color: var(--text-muted);
+            font-size: 0.75rem;
+            letter-spacing: 0.15em;
+            text-transform: uppercase;
+            animation: bounce 2s infinite;
+        }
+        @keyframes bounce {
+            0%,
+            20%,
+            50%,
+            80%,
+            100% {
+                transform: translateX(-50%) translateY(0);
+            }
+            40% {
+                transform: translateX(-50%) translateY(-10px);
+            }
+            60% {
+                transform: translateX(-50%) translateY(-5px);
+            }
+        }
+
+        /* ── About ── */
+        .about {
+            padding: 6rem 2rem;
+            background: var(--dark-brown);
+            position: relative;
+        }
+        .about::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
+        }
+        .about-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+        }
+        .about-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .about h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            color: var(--cream);
+            margin-bottom: 1.5rem;
+            line-height: 1.2;
+        }
+        .about p {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 1.5rem;
+        }
+        .about-visual {
+            position: relative;
+            height: 400px;
+            background: linear-gradient(145deg, var(--deep-brown), #0D0503);
+            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            border: 1px solid rgba(212, 160, 23, 0.1);
+        }
+        .about-visual::before {
+            content: '';
+            position: absolute;
+            width: 200%;
+            height: 200%;
+            background: repeating-linear-gradient(45deg,
+                    transparent, transparent 10px,
+                    rgba(212, 160, 23, 0.03) 10px,
+                    rgba(212, 160, 23, 0.03) 20px);
+            animation: slide 20s linear infinite;
+        }
+        @keyframes slide {
+            0% {
+                transform: translate(-50%, -50%);
+            }
+            100% {
+                transform: translate(0, 0);
+            }
+        }
+        .about-visual-icon {
+            position: relative;
+            z-index: 2;
+            width: 80px;
+            height: 80px;
+            color: var(--gold);
+            opacity: 0.8;
+        }
+
+        /* ── Gallery ── */
+        .gallery {
+            padding: 5rem 0;
+            background: var(--deep-brown);
+            position: relative;
+            overflow: hidden;
+        }
+        .gallery::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
+        }
+        .gallery-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            padding: 0 2rem;
+        }
+        .gallery-header .label {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .gallery-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            color: var(--cream);
+            margin-bottom: 1rem;
+        }
+        .gallery-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .gallery-scroll-container {
+            position: relative;
+            padding: 0 2rem;
+        }
+        .gallery-scroll {
+            display: flex;
+            gap: 1.25rem;
+            overflow-x: auto;
+            scroll-snap-type: x mandatory;
+            scroll-behavior: smooth;
+            padding: 1rem 0.5rem 2rem;
+            -webkit-overflow-scrolling: touch;
+            scrollbar-width: thin;
+            scrollbar-color: var(--gold) transparent;
+        }
+        .gallery-scroll::-webkit-scrollbar {
+            height: 6px;
+        }
+        .gallery-scroll::-webkit-scrollbar-track {
+            background: rgba(212, 160, 23, 0.05);
+            border-radius: 3px;
+        }
+        .gallery-scroll::-webkit-scrollbar-thumb {
+            background: var(--gold);
+            border-radius: 3px;
+        }
+        .gallery-item {
+            flex: 0 0 auto;
+            scroll-snap-align: start;
+            width: 300px;
+            height: 220px;
+            border-radius: 8px;
+            overflow: hidden;
+            border: 1px solid rgba(212, 160, 23, 0.1);
+            transition: all 0.4s ease;
+            position: relative;
+        }
+        .gallery-item:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4);
+            border-color: rgba(212, 160, 23, 0.3);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.08);
+        }
+        .gallery-nav {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+        .gallery-nav-btn {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid rgba(212, 160, 23, 0.3);
+            background: rgba(212, 160, 23, 0.05);
+            color: var(--gold);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .gallery-nav-btn:hover {
+            background: var(--gold);
+            color: var(--deep-brown);
+            border-color: var(--gold);
+        }
+        .gallery-nav-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+
+        /* ── Services ── */
+        .services {
+            padding: 6rem 2rem;
+            background: var(--deep-brown);
+            position: relative;
+        }
+        .services::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
+        }
+        .services-header {
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto 4rem;
+        }
+        .services-header .label {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: block;
+        }
+        .services-header h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            color: var(--cream);
+            margin-bottom: 1rem;
+        }
+        .services-header p {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+        .services-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 1.5rem;
+        }
+        .service-card {
+            background: rgba(30, 20, 15, 0.6);
+            border-radius: 8px;
+            border: 1px solid rgba(212, 160, 23, 0.08);
+            transition: all 0.4s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .service-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: var(--gold);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+            z-index: 2;
+        }
+        .service-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            border-color: rgba(212, 160, 23, 0.2);
+        }
+        .service-card:hover::before {
+            transform: scaleX(1);
+        }
+        .service-image {
+            width: 100%;
+            height: 200px;
+            overflow: hidden;
+            position: relative;
+        }
+        .service-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+        .service-card:hover .service-image img {
+            transform: scale(1.08);
+        }
+        .service-image::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 60px;
+            background: linear-gradient(transparent, rgba(30, 20, 15, 0.9));
+        }
+        .service-body {
+            padding: 1.5rem 1.75rem 2rem;
+        }
+        .service-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.25rem;
+            color: var(--cream);
+            margin-bottom: 0.75rem;
+        }
+        .service-card p {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+
+        /* ── Contact ── */
+        .contact {
+            padding: 6rem 2rem;
+            background: linear-gradient(180deg, var(--dark-brown) 0%, var(--deep-brown) 100%);
+            color: var(--cream);
+            position: relative;
+            overflow: hidden;
+        }
+        .contact::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 1px;
+            background: linear-gradient(90deg, transparent, rgba(212, 160, 23, 0.3), transparent);
+        }
+        .contact::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -20%;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(212, 160, 23, 0.06) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+        .contact-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: start;
+            position: relative;
+            z-index: 2;
+        }
+        .contact-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            color: var(--gold);
+            font-weight: 600;
+            margin-bottom: 1rem;
+        }
+        .contact h2 {
+            font-family: 'Playfair Display', serif;
+            font-size: clamp(1.8rem, 3vw, 2.5rem);
+            color: var(--cream);
+            margin-bottom: 1.5rem;
+        }
+        .contact-desc {
+            color: var(--text-muted);
+            font-size: 1.05rem;
+            line-height: 1.8;
+            margin-bottom: 2.5rem;
+        }
+        .contact-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+        .contact-item-icon {
+            width: 44px;
+            height: 44px;
+            background: rgba(212, 160, 23, 0.1);
+            border: 1px solid rgba(212, 160, 23, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            color: var(--gold);
+        }
+        .contact-item-icon svg {
+            width: 20px;
+            height: 20px;
+        }
+        .contact-item-info h4 {
+            font-size: 0.8rem;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--gold);
+            margin-bottom: 0.25rem;
+            font-weight: 500;
+        }
+        .contact-item-info a,
+        .contact-item-info span {
+            color: var(--cream);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+        .contact-item-info a:hover {
+            color: var(--gold);
+        }
+
+        /* ── Contact Form Card ── */
+        .contact-form-card {
+            background: rgba(20, 10, 5, 0.5);
+            border: 1px solid rgba(212, 160, 23, 0.1);
+            border-radius: 8px;
+            padding: 2.5rem;
+            backdrop-filter: blur(10px);
+        }
+        .contact-form-card h3 {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--cream);
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+        .form-group label {
+            display: block;
+            font-size: 0.8rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.4rem;
+            font-weight: 500;
+        }
+        .form-group .field-hint {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            opacity: 0.6;
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+            margin-top: 0.2rem;
+        }
+        .form-group input,
+        .form-group textarea,
+        .form-group select {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(212, 160, 23, 0.15);
+            border-radius: 4px;
+            color: var(--cream);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
+        }
+        .form-group input:focus,
+        .form-group textarea:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--gold);
+            background: rgba(255, 255, 255, 0.06);
+        }
+        .form-group input::placeholder,
+        .form-group textarea::placeholder {
+            color: rgba(168, 155, 140, 0.4);
+        }
+        .form-group textarea {
+            min-height: 120px;
+            resize: vertical;
+        }
+        .form-group select {
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%23D4A017' stroke-width='1.5' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 1rem center;
+            background-size: 12px;
+            cursor: pointer;
+        }
+        .form-group select option {
+            background: var(--dark-brown);
+            color: var(--cream);
+        }
+
+        /* Radio / inline options */
+        .form-row-inline {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem 2rem;
+            align-items: center;
+            padding-top: 0.25rem;
+        }
+        .form-row-inline label {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+            font-size: 0.9rem;
+            text-transform: none;
+            letter-spacing: 0;
+            color: var(--cream);
+            cursor: pointer;
+            font-weight: 400;
+        }
+        .form-row-inline input[type="radio"] {
+            width: 18px;
+            height: 18px;
+            accent-color: var(--gold);
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        /* Conditional fields */
+        .conditional-field {
+            display: none;
+            animation: fadeSlide 0.3s ease forwards;
+        }
+        .conditional-field.show {
+            display: block;
+        }
+        @keyframes fadeSlide {
+            0% {
+                opacity: 0;
+                transform: translateY(-6px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Submit button */
+        .form-submit {
+            width: 100%;
+            padding: 1rem;
+            background: var(--gold);
+            color: var(--deep-brown);
+            border: none;
+            border-radius: 4px;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.9rem;
+            letter-spacing: 0.05em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 0.5rem;
+        }
+        .form-submit:hover {
+            background: var(--gold-light);
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(212, 160, 23, 0.2);
+        }
+        .form-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        .form-submit.sending::after {
+            content: '';
+            display: inline-block;
+            width: 14px;
+            height: 14px;
+            border: 2px solid var(--deep-brown);
+            border-top-color: transparent;
+            border-radius: 50%;
+            margin-left: 8px;
+            animation: spin 0.8s linear infinite;
+            vertical-align: middle;
+        }
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* ── WhatsApp floating button ── */
+        .whatsapp-float {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 999;
+            background: #25D366;
+            color: #fff;
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 6px 25px rgba(37, 211, 102, 0.4);
+            transition: all 0.3s ease;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+        .whatsapp-float:hover {
+            transform: scale(1.08);
+            box-shadow: 0 10px 35px rgba(37, 211, 102, 0.5);
+        }
+        .whatsapp-float svg {
+            width: 34px;
+            height: 34px;
+            fill: currentColor;
+        }
+        .whatsapp-float::after {
+            content: 'Chat on WhatsApp';
+            position: absolute;
+            right: 70px;
+            background: #25D366;
+            color: #fff;
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(10px);
+            transition: all 0.3s ease;
+            pointer-events: none;
+        }
+        .whatsapp-float:hover::after {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ── Footer ── */
+        .footer {
+            padding: 2.5rem 2rem;
+            background: #0D0503;
+            text-align: center;
+            border-top: 1px solid rgba(212, 160, 23, 0.1);
+        }
+        .footer p {
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            letter-spacing: 0.05em;
+        }
+        .footer-brand {
+            font-family: 'Playfair Display', serif;
+            color: var(--gold);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+        .footer-bar {
+            height: 4px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        /* ── Toast Notification ── */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--dark-brown);
+            border: 1px solid rgba(212, 160, 23, 0.3);
+            color: var(--cream);
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            z-index: 10000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+        .toast svg {
+            width: 20px;
+            height: 20px;
+            color: var(--gold);
+            flex-shrink: 0;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 768px) {
+            .about-inner,
+            .contact-inner {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+            .about-visual {
+                height: 250px;
+                order: -1;
+            }
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+            .contact-form-card {
+                padding: 1.5rem;
+            }
+            .gallery-item {
+                width: 260px;
+                height: 190px;
+            }
+            .modal-content {
+                padding: 2.5rem 1.5rem;
+            }
+            .modal-actions {
+                flex-direction: column;
+            }
+            .modal-btn {
+                width: 100%;
+                justify-content: center;
+            }
+            .whatsapp-float {
+                width: 52px;
+                height: 52px;
+                bottom: 1.25rem;
+                right: 1.25rem;
+            }
+            .whatsapp-float svg {
+                width: 28px;
+                height: 28px;
+            }
+            .whatsapp-float::after {
+                display: none;
+            }
+            .form-row-inline {
+                gap: 0.75rem 1.25rem;
+            }
+        }
+        @media (max-width: 480px) {
+            .contact-inner {
+                gap: 1.5rem;
+            }
+            .contact-form-card {
+                padding: 1.25rem;
+            }
+            .modal-content {
+                padding: 2rem 1.25rem;
+            }
+        }
+    </style>
 </head>
 <body>
 
-<!-- ===== MODAL ===== -->
-<div class="modal-overlay" id="successModal">
-  <div class="modal-content">
-    <div class="modal-icon">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
-        <polyline points="22 4 12 14.01 9 11.01"/>
-      </svg>
+    <!-- ===== TOAST ===== -->
+    <div class="toast" id="toast">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+            <polyline points="22 4 12 14.01 9 11.01"/>
+        </svg>
+        <span id="toastMessage">Notification</span>
     </div>
-    <h3>Message Sent!</h3>
-    <p>Thank you for reaching out. We have received your message and will get back to you within 24 hours.</p>
-    <button class="modal-btn" onclick="closeModal()">Got It</button>
-  </div>
-</div>
 
-<!-- Hero -->
-<section class="hero">
-  <div class="hero-accent-line"></div>
-  <div class="hero-content">
-    <div class="hero-badge">Est. 2021 &mdash; Ibadan, Nigeria</div>
-    <h1>Build Wise <span>Carpentry</span></h1>
-    <p class="hero-subtitle">Professional Carpentry &bull; Custom Furniture &bull; Interior Woodworks</p>
-    <a href="#contact" class="hero-cta">
-      Start Your Project
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+    <!-- ===== SUCCESS MODAL ===== -->
+    <div class="modal-overlay" id="successModal">
+        <div class="modal-content">
+            <button class="modal-close-x" onclick="closeModal()" aria-label="Close">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M18 6 6 18"/><path d="m6 6 12 12"/>
+                </svg>
+            </button>
+            <div class="modal-icon-wrap">
+                <div class="modal-icon-ring"></div>
+                <div class="modal-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+            </div>
+            <h3 id="modalTitle">Message Sent!</h3>
+            <p id="modalDesc">Thank you for reaching out to Build Wise Carpentry. We've captured your inquiry and will respond shortly.</p>
+            <div class="modal-actions">
+                <button class="modal-btn" onclick="closeModal()">Got It</button>
+                <a id="modalActionLink" href="#" target="_blank" class="modal-btn secondary" style="display:none;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
+                    <span id="modalActionLabel">Open WhatsApp</span>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <!-- ===== FLOATING WHATSAPP ===== -->
+    <a href="https://wa.me/2349040016542?text=Hi%20Build%20Wise%20Carpentry,%20I'm%20interested%20in%20your%20services." target="_blank" class="whatsapp-float" aria-label="Chat on WhatsApp">
+        <svg viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>
     </a>
-  </div>
-  <div class="hero-scroll">Scroll to explore</div>
-</section>
 
-<!-- About -->
-<section class="about">
-  <div class="about-inner">
-    <div class="about-text">
-      <div class="about-label">About Us</div>
-      <h2>Buildways Woodworks</h2>
-      <p>Bring your wood renovation ideas to life with skilled craftsmanship and professional carpentry services. We deliver quality construction solutions tailored to your needs.</p>
-      <p>From custom furniture to interior repairs, every piece we build reflects our commitment to precision, durability, and timeless design. Quality carpentry you can trust.</p>
-    </div>
-    <div class="about-visual">
-      <svg class="about-visual-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 21h18"/>
-        <path d="M5 21V7l8-4 8 4v14"/>
-        <path d="M9 21v-6h6v6"/>
-        <path d="M10 9h4"/>
-        <path d="M10 12h4"/>
-        <path d="M10 15h4"/>
-      </svg>
-    </div>
-  </div>
-</section>
-
-
-<!-- ===== GALLERY ===== -->
-<section class="gallery">
-  <div class="gallery-header">
-    <span class="label">Our Work</span>
-    <h2>Project Gallery</h2>
-    <p>Browse through our portfolio of handcrafted woodwork and furniture pieces</p>
-  </div>
-  <div class="gallery-scroll-container">
-    <div class="gallery-scroll" id="galleryScroll">
-    <div class="gallery-item"><img src="https://i.ibb.co/4RVcyt2j/c9fabc03e01c4f9ed84ad28f0460a7e3.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/B739xwN/32ad9d61e8de0795a7c490b1b03870f4.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/N2n2rrq5/54a5d733f26185aa18ee2282b64b1bb9.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/t9RRgZ5/357bcaf25cacbd12ea70c264238712bd.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/5Wj8tVM0/cd324386ce3fd3dae1d28f600ca1c6af.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/FbfkjDBD/6d5dde10baec8d8d562e23e46a9ea61d.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/0RM6x3f5/e195918e2744a5bbce77d9b6c3e7f96f.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/bqyh5LP/5bd70a0a10d69b83a002df4a2a20e83e.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/Nd8DW2Fn/3eba0d03adb2cab47be5faa1817263e5.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/MkLgKLRh/69858711d837df4f74b5ca88d915ab1d.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/sdFWw506/f69789e9bfafd90ee88edba10d505837.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/gMk2c3dv/0fc9893ede49a8876e5412b3f1ffd85d.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/s9FBMLYx/8de34973ddf6675aa3e1f8e9233b71be.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/Q7gscv5J/2a971bfac68efaf7c0ef639fac3492ab.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/0VXYF5Ps/5957162fa21498052ab4876f9693cae8.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/zVc8pMFn/f0dd4e7ccdc33b8bb9c660d6f074e1c5.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/s93NWgty/f8b280b17f34023c4c61dbe1cc37bac8.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/prPghY9w/aa5f437379fa3742b9537073a848c438.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/v4sW4f0M/f9e5b43f216bc5a963d1ab7a66020c7c.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/LD6nxfmK/2d3c6d3031fd381afac6278ae816d048.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/GvptQbTd/4bc78250fa45d7d34490fe88656abc45.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/Y75Vvk6m/e05b2b1da326c8656947acce301338a4.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/6ct2dRvv/e2de800730600990214cf64a19efbac7.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/xqmLTddd/0bad4c89580b5506c896c503bf052c1e.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/ymsgfrtb/aa2823b5e4156b8c5c0e59ca311db8b8.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/FqWcFj49/f3d719f819138db926b36c2c991f39d9.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/d4f3fzp7/940f14f6935b04072b40f456cc30cada.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/8gLdf28H/abe943476dd0d1e2602c5096b356dbc8.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/SXy3HBj0/e97e9ec9d3e39842b39de704ff8f8ebf.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/wh6R4TYF/d999cbe7108fb5b130b20597f489a160.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/XxxvvBw2/346dacf2f5e78c570fa4f8a5d017a009.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/dwfx1HCM/c7982adc62dbb5013eed465f0026d4f3.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/Jjsx4cX9/5669316f552e247cabe301fc792268da.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/PzcHtS17/66f876a1a8fed90b55a881a2b68a416c.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/Y4ZMctW1/32740497fe327f580eaf043cbb169be5.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/pGwNs0V/5805dd8ae22085fc7ccdb33a46fd4635.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/7JVKQvzM/281496cc5356b8af84dbba663f3f1185.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/xnBQD4s/c5a3390b9de3b35b424c9aa96ccbf790.jpg" alt="Carpentry Work" loading="lazy"></div>
-    <div class="gallery-item"><img src="https://i.ibb.co/gFP16SrS/ce46818aad25314860ed9572f5dbb1fe.jpg" alt="Carpentry Work" loading="lazy"></div>
-     <div class="gallery-item"><img src="https://i.ibb.co/hJ9LQDQR/3acf93fb424d1df2260e71dd0662bebe.jpg" alt="Carpentry Work" loading="lazy"></div>
-      <div class="gallery-item"><img src="https://i.ibb.co/hx2H85WW/7a1054d2e36368aae82ca8e262e0fcdd.jpg" alt="Carpentry Work" loading="lazy"></div>
-       <div class="gallery-item"><img src="https://i.ibb.co/gb4MtZkN/67129490af4a5389d9414e72a5d3b908.jpg" alt="Carpentry Work" loading="lazy"></div>
-        <div class="gallery-item"><img src="https://i.ibb.co/359GJp58/295bf6463ef12434895f2b9375bd008e.jpg" alt="Carpentry Work" loading="lazy"></div>
-         <div class="gallery-item"><img src="https://i.ibb.co/Wpn325VQ/cf6216db21eab397db62c7bb328abf4a.jpg" alt="Carpentry Work" loading="lazy"></div>
-          <div class="gallery-item"><img src="https://i.ibb.co/Fb8DcSzF/9db0b4302d5337e749b960f5407fe7ca.jpg" alt="Carpentry Work" loading="lazy"></div>
-           <div class="gallery-item"><img src="https://i.ibb.co/tMBG9zzR/b2f774f8e2cd2afa7cdda9a7dc8a615b.jpg" alt="Carpentry Work" loading="lazy"></div>
-            <div class="gallery-item"><img src="https://i.ibb.co/VWMFh23y/9f086ee26b7a7714f11fa9c840fb88ca.jpg" alt="Carpentry Work" loading="lazy"></div>
-             <div class="gallery-item"><img src="https://i.ibb.co/WNjGL4kB/ee62902f68b9137acea9a382f05320ff-1.jpg" alt="Carpentry Work" loading="lazy"></div>
-              <div class="gallery-item"><img src="https://i.ibb.co/6R2gSNht/132adaf4267ac6e3077ce616b30e960f.jpg" alt="Carpentry Work" loading="lazy"></div>
-              <div class="gallery-item"><img src="https://i.ibb.co/Q3dqkJ27/3613b0b43839e0c2ed7257220afc58f0.jpg" alt="Carpentry Work" loading="lazy"></div>
-             <div class="gallery-item"><img src="https://i.ibb.co/RpGGm6Rj/a1d930180a1ce1ea5dfdb977697f1ccf.jpg" alt="Carpentry Work" loading="lazy"></div>
-             <div class="gallery-item"><img src="https://i.ibb.co/ZpQsJJzk/c45c5933124ad37eb73f32314b38373c.jpg" alt="Carpentry Work" loading="lazy"></div>
-              <div class="gallery-item"><img src="https://i.ibb.co/4nTFXdzN/a5c2122c188b38cc4c2b662fae38a9f0.jpg" alt="Carpentry Work" loading="lazy"></div>
-         <div class="gallery-item"><img src="https://i.ibb.co/ymtfsMpZ/ace383f9d7fbfa9bd99f0426622ddf7b.jpg" alt="Carpentry Work" loading="lazy"></div>
-            <div class="gallery-item"><img src="https://i.ibb.co/8LjPSpk3/03c1ddad8eb8be54ec1257a16996c176.jpg" alt="Carpentry Work" loading="lazy"></div>
-           <div class="gallery-item"><img src="https://i.ibb.co/5g3Q3jb8/01dd3b62bad340fabb770bd4b28200c4.jpg" alt="Carpentry Work" loading="lazy"></div>
-            <div class="gallery-item"><img src="https://i.ibb.co/8Dtf26vB/ae1fc207f3f995e26dea35da6053758b.jpg" alt="Carpentry Work" loading="lazy"></div>
-           <div class="gallery-item"><img src="https://i.ibb.co/nsdMpRDp/088368842edc950b61619f640bc9493e.jpg" alt="Carpentry Work" loading="lazy"></div>
-             <div class="gallery-item"><img src="https://i.ibb.co/qLKTFrw2/d25e7f54ec924c5548612ec5b9a70e46.jpg" alt="Carpentry Work" loading="lazy"></div>
-             <div class="gallery-item"><img src="https://i.ibb.co/Rpp91Zd1/cb114ee63e26e845da58a7ad8085e08e.jpg" alt="Carpentry Work" loading="lazy"></div>
-              <div class="gallery-item"><img src="https://i.ibb.co/GQJFpmM6/1fa6d76206e4311e5fadc5a9de0aa1d8.jpg" alt="Carpentry Work" loading="lazy"></div>
-         <div class="gallery-item"><img src="https://i.ibb.co/jvw49srf/97bc3a2f0a4f3b964ab01798a39eb016.jpg" alt="Carpentry Work" loading="lazy"></div>
-        <div class="gallery-item"><img src="https://i.ibb.co/cX8w8fZs/97f02400818ad3304906f133384662dc.jpg" alt="Carpentry Work" loading="lazy"></div>        
-    <div class="gallery-item"><img src="https://i.ibb.co/h6XkHJ6/046ac799a04bd35aab70a05a9d1c921b.jpg" alt="Carpentry Work" loading="lazy"></div>
-
-    </div>
-  </div>
-  <div class="gallery-nav">
-    <button class="gallery-nav-btn" onclick="scrollGallery(-1)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-    </button>
-    <button class="gallery-nav-btn" onclick="scrollGallery(1)">
-      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-    </button>
-  </div>
-</section>
-
-<!-- Services -->
-<section class="services">
-  <div class="services-header">
-    <span class="label">What We Do</span>
-    <h2>Our Services</h2>
-    <p>Comprehensive carpentry and construction solutions for homes and businesses</p>
-  </div>
-  <div class="services-grid">
-    <div class="service-card">
-      <div class="service-image">
-        <img src="https://i.ibb.co/hRg1xSD0/Screenshot-20260705-070604-2.jpg" alt="Wooden Furniture">
-      </div>
-      <div class="service-body">
-        <h3>Wooden Furniture</h3>
-        <p>Handcrafted tables, chairs, beds, and storage units built to last with premium hardwoods.</p>
-      </div>
-    </div>
-    <div class="service-card">
-      <div class="service-image">
-        <img src="https://i.ibb.co/GQx34ZvZ/5cf94f02c1b3d0b511f6677257758be7.jpg" alt="Interior Repairs">
-      </div>
-      <div class="service-body">
-        <h3>Interior Repairs</h3>
-        <p>Restoration and repair of damaged woodwork, flooring, doors, and built-in fixtures.</p>
-      </div>
-    </div>
-    <div class="service-card">
-      <div class="service-image">
-        <img src="https://i.ibb.co/LX4CWN3N/d0c75cb9d60c72fc0de58fba4833a348.jpg" alt="Custom Framing">
-      </div>
-      <div class="service-body">
-        <h3>Custom Framing</h3>
-        <p>Bespoke picture frames, mirror frames, and decorative molding tailored to your style.</p>
-      </div>
-    </div>
-    <div class="service-card">
-      <div class="service-image">
-        <img src="https://i.ibb.co/3YL772Wz/847349e8971b9940070078776bb8578d.jpg" alt="Project Planning">
-      </div>
-      <div class="service-body">
-        <h3>Project Planning</h3>
-        <p>Detailed blueprints, material sourcing, and timeline management for smooth execution.</p>
-      </div>
-    </div>
-    <div class="service-card">
-      <div class="service-image">
-        <img src="https://i.ibb.co/WpfgWw2j/dc1afe6ca3745bda1d79086637df2fe8.jpg" alt="Expert Construction">
-      </div>
-      <div class="service-body">
-        <h3>Expert Construction</h3>
-        <p>Full-scale wood construction services from framing to finishing for residential projects.</p>
-      </div>
-    </div>
-    <div class="service-card">
-      <div class="service-image">
-        <img src="https://i.ibb.co/YFS8wMKH/efcf7737a4fe24a6ee994640daa3dba1.jpg" alt="All Carpentry Work">
-      </div>
-      <div class="service-body">
-        <h3>All Carpentry Work</h3>
-        <p>No job too small or large — from minor fixes to complete woodwork overhauls.</p>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Contact -->
-<section class="contact" id="contact">
-  <div class="contact-inner">
-    <div class="contact-info">
-      <div class="contact-label">Get in Touch</div>
-      <h2>Contact Us</h2>
-      <p class="contact-desc">Bring your vision to life with precision and care. Buildways Woodworks — quality carpentry you can trust. Reach out and let's discuss your next project.</p>
-
-      <div class="contact-item">
-        <div class="contact-item-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+    <!-- ===== HERO ===== -->
+    <section class="hero">
+        <div class="hero-accent-line"></div>
+        <div class="hero-content">
+            <div class="hero-badge">Est. 2021 &mdash; Ibadan, Nigeria</div>
+            <h1>Build Wise <span>Carpentry</span></h1>
+            <p class="hero-subtitle">Professional Carpentry &bull; Custom Furniture &bull; Interior Woodworks</p>
+            <a href="#contact" class="hero-cta">
+                Start Your Project
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m12 5 7 7-7 7"/></svg>
+            </a>
         </div>
-        <div class="contact-item-info">
-          <h4>Phone / WhatsApp</h4>
-          <a href="https://wa.me/2349040016542" target="_blank">+234 904 001 6542</a>
+        <div class="hero-scroll">Scroll to explore</div>
+    </section>
+
+    <!-- ===== ABOUT ===== -->
+    <section class="about">
+        <div class="about-inner">
+            <div class="about-text">
+                <div class="about-label">About Us</div>
+                <h2>Buildways Woodworks</h2>
+                <p>Bring your wood renovation ideas to life with skilled craftsmanship and professional carpentry services. We deliver quality construction solutions tailored to your needs.</p>
+                <p>From custom furniture to interior repairs, every piece we build reflects our commitment to precision, durability, and timeless design. Quality carpentry you can trust.</p>
+            </div>
+            <div class="about-visual">
+                <svg class="about-visual-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M3 21h18"/>
+                    <path d="M5 21V7l8-4 8 4v14"/>
+                    <path d="M9 21v-6h6v6"/>
+                    <path d="M10 9h4"/>
+                    <path d="M10 12h4"/>
+                    <path d="M10 15h4"/>
+                </svg>
+            </div>
         </div>
-      </div>
+    </section>
 
-      <div class="contact-item">
-        <div class="contact-item-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+    <!-- ===== GALLERY ===== -->
+    <section class="gallery">
+        <div class="gallery-header">
+            <span class="label">Our Work</span>
+            <h2>Project Gallery</h2>
+            <p>Browse through our portfolio of handcrafted woodwork and furniture pieces</p>
         </div>
-        <div class="contact-item-info">
-          <h4>Email</h4>
-          <a href="mailto:samuelokikiola987@gmail.com">samuelokikiola987@gmail.com</a>
+        <div class="gallery-scroll-container">
+            <div class="gallery-scroll" id="galleryScroll">
+                <div class="gallery-item"><img src="https://i.ibb.co/4RVcyt2j/c9fabc03e01c4f9ed84ad28f0460a7e3.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/B739xwN/32ad9d61e8de0795a7c490b1b03870f4.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/N2n2rrq5/54a5d733f26185aa18ee2282b64b1bb9.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/t9RRgZ5/357bcaf25cacbd12ea70c264238712bd.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/5Wj8tVM0/cd324386ce3fd3dae1d28f600ca1c6af.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/FbfkjDBD/6d5dde10baec8d8d562e23e46a9ea61d.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/0RM6x3f5/e195918e2744a5bbce77d9b6c3e7f96f.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/bqyh5LP/5bd70a0a10d69b83a002df4a2a20e83e.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Nd8DW2Fn/3eba0d03adb2cab47be5faa1817263e5.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/MkLgKLRh/69858711d837df4f74b5ca88d915ab1d.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/sdFWw506/f69789e9bfafd90ee88edba10d505837.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/gMk2c3dv/0fc9893ede49a8876e5412b3f1ffd85d.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/s9FBMLYx/8de34973ddf6675aa3e1f8e9233b71be.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Q7gscv5J/2a971bfac68efaf7c0ef639fac3492ab.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/0VXYF5Ps/5957162fa21498052ab4876f9693cae8.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/zVc8pMFn/f0dd4e7ccdc33b8bb9c660d6f074e1c5.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/s93NWgty/f8b280b17f34023c4c61dbe1cc37bac8.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/prPghY9w/aa5f437379fa3742b9537073a848c438.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/v4sW4f0M/f9e5b43f216bc5a963d1ab7a66020c7c.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/LD6nxfmK/2d3c6d3031fd381afac6278ae816d048.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/GvptQbTd/4bc78250fa45d7d34490fe88656abc45.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Y75Vvk6m/e05b2b1da326c8656947acce301338a4.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/6ct2dRvv/e2de800730600990214cf64a19efbac7.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/xqmLTddd/0bad4c89580b5506c896c503bf052c1e.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/ymsgfrtb/aa2823b5e4156b8c5c0e59ca311db8b8.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/FqWcFj49/f3d719f819138db926b36c2c991f39d9.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/d4f3fzp7/940f14f6935b04072b40f456cc30cada.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/8gLdf28H/abe943476dd0d1e2602c5096b356dbc8.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/SXy3HBj0/e97e9ec9d3e39842b39de704ff8f8ebf.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/wh6R4TYF/d999cbe7108fb5b130b20597f489a160.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/XxxvvBw2/346dacf2f5e78c570fa4f8a5d017a009.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/dwfx1HCM/c7982adc62dbb5013eed465f0026d4f3.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Jjsx4cX9/5669316f552e247cabe301fc792268da.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/PzcHtS17/66f876a1a8fed90b55a881a2b68a416c.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Y4ZMctW1/32740497fe327f580eaf043cbb169be5.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/pGwNs0V/5805dd8ae22085fc7ccdb33a46fd4635.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/7JVKQvzM/281496cc5356b8af84dbba663f3f1185.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/xnBQD4s/c5a3390b9de3b35b424c9aa96ccbf790.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/gFP16SrS/ce46818aad25314860ed9572f5dbb1fe.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/hJ9LQDQR/3acf93fb424d1df2260e71dd0662bebe.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/hx2H85WW/7a1054d2e36368aae82ca8e262e0fcdd.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/gb4MtZkN/67129490af4a5389d9414e72a5d3b908.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/359GJp58/295bf6463ef12434895f2b9375bd008e.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Wpn325VQ/cf6216db21eab397db62c7bb328abf4a.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Fb8DcSzF/9db0b4302d5337e749b960f5407fe7ca.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/tMBG9zzR/b2f774f8e2cd2afa7cdda9a7dc8a615b.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/VWMFh23y/9f086ee26b7a7714f11fa9c840fb88ca.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/WNjGL4kB/ee62902f68b9137acea9a382f05320ff-1.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/6R2gSNht/132adaf4267ac6e3077ce616b30e960f.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Q3dqkJ27/3613b0b43839e0c2ed7257220afc58f0.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/RpGGm6Rj/a1d930180a1ce1ea5dfdb977697f1ccf.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/ZpQsJJzk/c45c5933124ad37eb73f32314b38373c.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/4nTFXdzN/a5c2122c188b38cc4c2b662fae38a9f0.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/ymtfsMpZ/ace383f9d7fbfa9bd99f0426622ddf7b.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/8LjPSpk3/03c1ddad8eb8be54ec1257a16996c176.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/5g3Q3jb8/01dd3b62bad340fabb770bd4b28200c4.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/8Dtf26vB/ae1fc207f3f995e26dea35da6053758b.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/nsdMpRDp/088368842edc950b61619f640bc9493e.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/qLKTFrw2/d25e7f54ec924c5548612ec5b9a70e46.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/Rpp91Zd1/cb114ee63e26e845da58a7ad8085e08e.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/GQJFpmM6/1fa6d76206e4311e5fadc5a9de0aa1d8.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/jvw49srf/97bc3a2f0a4f3b964ab01798a39eb016.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/cX8w8fZs/97f02400818ad3304906f133384662dc.jpg" alt="Carpentry Work" loading="lazy"/></div>
+                <div class="gallery-item"><img src="https://i.ibb.co/h6XkHJ6/046ac799a04bd35aab70a05a9d1c921b.jpg" alt="Carpentry Work" loading="lazy"/></div>
+            </div>
         </div>
-      </div>
-    </div>
-
-    <div class="contact-form-card">
-      <h3>Send a Message</h3>
-      <form onsubmit="event.preventDefault(); openModal(); this.reset();">
-        <div class="form-group">
-          <label>Your Name</label>
-          <input type="text" placeholder="John Doe" required>
+        <div class="gallery-nav">
+            <button class="gallery-nav-btn" onclick="scrollGallery(-1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
+            </button>
+            <button class="gallery-nav-btn" onclick="scrollGallery(1)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
+            </button>
         </div>
-        <div class="form-group">
-          <label>Email Address</label>
-          <input type="email" placeholder="john@example.com" required>
+    </section>
+
+    <!-- ===== SERVICES ===== -->
+    <section class="services">
+        <div class="services-header">
+            <span class="label">What We Do</span>
+            <h2>Our Services</h2>
+            <p>Comprehensive carpentry and construction solutions for homes and businesses</p>
         </div>
-        <div class="form-group">
-          <label>Project Details</label>
-          <textarea placeholder="Tell us about your project..." required></textarea>
+        <div class="services-grid">
+            <div class="service-card">
+                <div class="service-image"><img src="https://i.ibb.co/hRg1xSD0/Screenshot-20260705-070604-2.jpg" alt="Wooden Furniture"/></div>
+                <div class="service-body"><h3>Wooden Furniture</h3><p>Handcrafted tables, chairs, beds, and storage units built to last with premium hardwoods.</p></div>
+            </div>
+            <div class="service-card">
+                <div class="service-image"><img src="https://i.ibb.co/GQx34ZvZ/5cf94f02c1b3d0b511f6677257758be7.jpg" alt="Interior Repairs"/></div>
+                <div class="service-body"><h3>Interior Repairs</h3><p>Restoration and repair of damaged woodwork, flooring, doors, and built-in fixtures.</p></div>
+            </div>
+            <div class="service-card">
+                <div class="service-image"><img src="https://i.ibb.co/LX4CWN3N/d0c75cb9d60c72fc0de58fba4833a348.jpg" alt="Custom Framing"/></div>
+                <div class="service-body"><h3>Custom Framing</h3><p>Bespoke picture frames, mirror frames, and decorative molding tailored to your style.</p></div>
+            </div>
+            <div class="service-card">
+                <div class="service-image"><img src="https://i.ibb.co/3YL772Wz/847349e8971b9940070078776bb8578d.jpg" alt="Project Planning"/></div>
+                <div class="service-body"><h3>Project Planning</h3><p>Detailed blueprints, material sourcing, and timeline management for smooth execution.</p></div>
+            </div>
+            <div class="service-card">
+                <div class="service-image"><img src="https://i.ibb.co/WpfgWw2j/dc1afe6ca3745bda1d79086637df2fe8.jpg" alt="Expert Construction"/></div>
+                <div class="service-body"><h3>Expert Construction</h3><p>Full-scale wood construction services from framing to finishing for residential projects.</p></div>
+            </div>
+            <div class="service-card">
+                <div class="service-image"><img src="https://i.ibb.co/YFS8wMKH/efcf7737a4fe24a6ee994640daa3dba1.jpg" alt="All Carpentry Work"/></div>
+                <div class="service-body"><h3>All Carpentry Work</h3><p>No job too small or large — from minor fixes to complete woodwork overhauls.</p></div>
+            </div>
         </div>
-        <button type="submit" class="form-submit">Send Message</button>
-      </form>
-    </div>
-  </div>
-</section>
+    </section>
 
-<!-- Footer -->
-<footer class="footer">
-  <div class="footer-brand">Build Wise Carpentry</div>
-  <p>&copy; 2026 Buildways Woodworks. All rights reserved.</p>
-</footer>
-<div class="footer-bar"></div>
+    <!-- ===== CONTACT ===== -->
+    <section class="contact" id="contact">
+        <div class="contact-inner">
 
-<script>
-  // Smooth scroll for anchor links
-  document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function(e) {
-      e.preventDefault();
-      const target = document.querySelector(this.getAttribute('href'));
-      if (target) {
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      }
-    });
-  });
+            <!-- Left: Contact Info -->
+            <div class="contact-info">
+                <div class="contact-label">Get in Touch</div>
+                <h2>Contact Us</h2>
+                <p class="contact-desc">Bring your vision to life with precision and care. Buildways Woodworks — quality carpentry you can trust. Reach out and let's discuss your next project.</p>
 
-  // Modal functions
-  function openModal() {
-    document.getElementById('successModal').classList.add('active');
-  }
+                <div class="contact-item">
+                    <div class="contact-item-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                    </div>
+                    <div class="contact-item-info">
+                        <h4>Phone / WhatsApp</h4>
+                        <a href="https://wa.me/2349040016542?text=Hi%20Build%20Wise%20Carpentry" target="_blank">+234 904 001 6542</a>
+                    </div>
+                </div>
 
-  function closeModal() {
-    document.getElementById('successModal').classList.remove('active');
-  }
+                <div class="contact-item">
+                    <div class="contact-item-icon">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"/></svg>
+                    </div>
+                    <div class="contact-item-info">
+                        <h4>Email</h4>
+                        <a href="mailto:samuelokikiola987@gmail.com?subject=Carpentry%20Inquiry%20-%20Build%20Wise">samuelokikiola987@gmail.com</a>
+                    </div>
+                </div>
+            </div>
 
-  // Close modal on overlay click
-  document.getElementById('successModal').addEventListener('click', function(e) {
-    if (e.target === this) closeModal();
-  });
+            <!-- Right: Contact Form -->
+            <div class="contact-form-card">
+                <h3>Send a Message</h3>
 
-  // Close modal on Escape key
-  document.addEventListener('keydown', function(e) {
-    if (e.key === 'Escape') closeModal();
-  });
+                <form id="contactForm" onsubmit="return handleFormSubmit(event)">
 
-  // Gallery scroll
-  function scrollGallery(direction) {
-    const scroll = document.getElementById('galleryScroll');
-    const scrollAmount = 320;
-    scroll.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' });
-  }
+                    <!-- A. Title + Name -->
+                    <div class="form-group">
+                        <label>Title</label>
+                        <select id="titleSelect" name="title">
+                            <option value="Mr">Mr</option>
+                            <option value="Prince">Prince</option>
+                            <option value="Chief">Chief</option>
+                            <option value="Honourable">Honourable</option>
+                            <option value="Doctor">Doctor</option>
+                            <option value="Engineer">Engineer</option>
+                        </select>
+                    </div>
 
-  // Intersection Observer for fade-in animations
-  const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.style.opacity = '1';
-        entry.target.style.transform = 'translateY(0)';
-      }
-    });
-  }, observerOptions);
+                    <div class="form-group">
+                        <label>Full Name</label>
+                        <input type="text" id="fullName" name="fullName" placeholder="Adetosoye Emmanuel Adebanjo" required />  
+                    </div>
 
-  document.querySelectorAll('.service-card, .about-text, .about-visual, .contact-info, .contact-form-card, .gallery-header, .gallery-item').forEach(el => {
-    el.style.opacity = '0';
-    el.style.transform = 'translateY(30px)';
-    el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-    observer.observe(el);
-  });
-</script>
+                    <!-- B. How to reach you -->
+                    <div class="form-group">
+                        <label>How should we reach you?</label>
+                        <div class="form-row-inline" id="reachMethod">
+                            <label>
+                                <input type="radio" name="reachMethod" value="whatsapp" checked />
+                                WhatsApp
+                            </label>
+                            <label>
+                                <input type="radio" name="reachMethod" value="email" />
+                                Email
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Conditional: WhatsApp number -->
+                    <div class="conditional-field show" id="reachWhatsappField">
+                        <div class="form-group">
+                            <label>WhatsApp Number</label>
+                            <input type="tel" id="reachWhatsapp" name="reachWhatsapp" placeholder="+234 800 000 0000" />
+                            <div class="field-hint">We'll contact you via this number</div>
+                        </div>
+                    </div>
+
+                    <!-- Conditional: Email address -->
+                    <div class="conditional-field" id="reachEmailField">
+                        <div class="form-group">
+                            <label>Email Address</label>
+                            <input type="email" id="reachEmail" name="reachEmail" placeholder="you@example.com" />
+                            <div class="field-hint">We'll contact you via this email</div>
+                        </div>
+                    </div>
+
+                    <!-- C. How to contact Build Wise -->
+                    <div class="form-group">
+                        <label>How would you like to send this message?</label>
+                        <div class="form-row-inline" id="sendMethod">
+                            <label>
+                                <input type="radio" name="sendMethod" value="whatsapp" checked />
+                                WhatsApp
+                            </label>
+                            <label>
+                                <input type="radio" name="sendMethod" value="email" />
+                                Email
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- D. Project details -->
+                    <div class="form-group">
+                        <label>Tell us about your project</label>
+                        <textarea id="projectMessage" name="projectMessage" placeholder="Describe your carpentry needs, dimensions, materials, timeline..." required></textarea>
+                    </div>
+
+                    <button type="submit" class="form-submit" id="submitBtn">Send Message</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <!-- ===== FOOTER ===== -->
+    <footer class="footer">
+        <div class="footer-brand">Build Wise Carpentry</div>
+        <p>&copy; 2026 Buildways Woodworks. All rights reserved.</p>
+    </footer>
+    <div class="footer-bar"></div>
+
+    <!-- ===== SCRIPTS ===== -->
+    <script>
+        // ── Smooth anchor scroll ──
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function(e) {
+                const href = this.getAttribute('href');
+                if (href === '#') return;
+                e.preventDefault();
+                const target = document.querySelector(href);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        // ── Toast ──
+        function showToast(message, duration = 3000) {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toastMsg.textContent = message;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), duration);
+        }
+
+        // ── Modal ──
+        function openModal() {
+            document.getElementById('successModal').classList.add('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal() {
+            document.getElementById('successModal').classList.remove('active');
+            document.body.style.overflow = '';
+        }
+
+        document.getElementById('successModal').addEventListener('click', function(e) {
+            if (e.target === this) closeModal();
+        });
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // ── Gallery scroll ──
+        function scrollGallery(direction) {
+            const scroll = document.getElementById('galleryScroll');
+            scroll.scrollBy({ left: direction * 320, behavior: 'smooth' });
+        }
+
+        // ── Conditional fields: Reach Method ──
+        const reachRadios = document.querySelectorAll('input[name="reachMethod"]');
+        const reachWhatsappField = document.getElementById('reachWhatsappField');
+        const reachEmailField = document.getElementById('reachEmailField');
+        const reachWhatsappInput = document.getElementById('reachWhatsapp');
+        const reachEmailInput = document.getElementById('reachEmail');
+
+        function toggleReachFields() {
+            const selected = document.querySelector('input[name="reachMethod"]:checked');
+            if (selected) {
+                if (selected.value === 'whatsapp') {
+                    reachWhatsappField.classList.add('show');
+                    reachEmailField.classList.remove('show');
+                    reachWhatsappInput.required = true;
+                    reachEmailInput.required = false;
+                    reachWhatsappInput.disabled = false;
+                    reachEmailInput.disabled = true;
+                } else {
+                    reachWhatsappField.classList.remove('show');
+                    reachEmailField.classList.add('show');
+                    reachWhatsappInput.required = false;
+                    reachEmailInput.required = true;
+                    reachWhatsappInput.disabled = true;
+                    reachEmailInput.disabled = false;
+                }
+            }
+        }
+
+        reachRadios.forEach(r => r.addEventListener('change', toggleReachFields));
+        // Initial state
+        setTimeout(toggleReachFields, 50);
+
+        // ── Form submission handler ──
+        function handleFormSubmit(e) {
+            e.preventDefault();
+
+            const title = document.getElementById('titleSelect').value;
+            const fullName = document.getElementById('fullName').value.trim();
+            const reachMethod = document.querySelector('input[name="reachMethod"]:checked')?.value || 'whatsapp';
+            const reachWhatsapp = document.getElementById('reachWhatsapp').value.trim();
+            const reachEmail = document.getElementById('reachEmail').value.trim();
+            const sendMethod = document.querySelector('input[name="sendMethod"]:checked')?.value || 'whatsapp';
+            const message = document.getElementById('projectMessage').value.trim();
+
+            // Validation
+            if (!fullName) {
+                showToast('Please enter your full name.');
+                return false;
+            }
+            if (reachMethod === 'whatsapp' && !reachWhatsapp) {
+                showToast('Please enter your WhatsApp number.');
+                return false;
+            }
+            if (reachMethod === 'email' && !reachEmail) {
+                showToast('Please enter your email address.');
+                return false;
+            }
+            if (reachMethod === 'email' && reachEmail && !reachEmail.includes('@')) {
+                showToast('Please enter a valid email address.');
+                return false;
+            }
+            if (!message) {
+                showToast('Please tell us about your project.');
+                return false;
+            }
+
+            // Build display name
+            const displayName = `${title} ${fullName}`;
+
+            // Build message body
+            const contactInfo = reachMethod === 'whatsapp' ?
+                `WhatsApp: ${reachWhatsapp}` :
+                `Email: ${reachEmail}`;
+
+            const fullMessage =
+                `Name: ${displayName}\n` +
+                `Contact: ${contactInfo}\n` +
+                `Preferred contact method: ${reachMethod === 'whatsapp' ? 'WhatsApp' : 'Email'}\n\n` +
+                `Project Details:\n${message}`;
+
+            // Encode
+            const encodedMessage = encodeURIComponent(fullMessage);
+            const encodedSubject = encodeURIComponent(`Carpentry Inquiry - ${displayName}`);
+
+            // Show loading
+            const btn = document.getElementById('submitBtn');
+            btn.disabled = true;
+            btn.classList.add('sending');
+            btn.textContent = 'Sending...';
+
+            // Determine action based on sendMethod
+            if (sendMethod === 'whatsapp') {
+                // Send via WhatsApp
+                const waLink = `https://wa.me/2349040016542?text=${encodedMessage}`;
+                // Open WhatsApp
+                window.open(waLink, '_blank');
+
+                // Show modal with WhatsApp option
+                setTimeout(() => {
+                    btn.disabled = false;
+                    btn.classList.remove('sending');
+                    btn.textContent = 'Send Message';
+
+                    document.getElementById('modalTitle').textContent = 'Message Ready!';
+                    document.getElementById('modalDesc').textContent =
+                        `Your message has been prepared for WhatsApp. Click the button below to send it directly.`;
+                    const actionLink = document.getElementById('modalActionLink');
+                    actionLink.href = waLink;
+                    actionLink.style.display = 'inline-flex';
+                    document.getElementById('modalActionLabel').textContent = 'Open WhatsApp';
+
+                    // Reset form
+                    document.getElementById('contactForm').reset();
+                    setTimeout(toggleReachFields, 50);
+
+                    openModal();
+                }, 600);
+
+            } else {
+                // Send via Email (mailto)
+                const mailtoLink =
+                    `mailto:samuelokikiola987@gmail.com?subject=${encodedSubject}&body=${encodedMessage}`;
+
+                // Try to open mail client
+                const iframe = document.createElement('iframe');
+                iframe.style.display = 'none';
+                document.body.appendChild(iframe);
+                iframe.src = mailtoLink;
+
+                // Also copy to clipboard as fallback
+                const clipboardText =
+                    `Build Wise Carpentry Inquiry\n` +
+                    `------------------------\n` +
+                    `Name: ${displayName}\n` +
+                    `Contact: ${contactInfo}\n` +
+                    `Project:\n${message}\n` +
+                    `------------------------\n` +
+                    `Send to: samuelokikiola987@gmail.com`;
+
+                if (navigator.clipboard && navigator.clipboard.writeText) {
+                    navigator.clipboard.writeText(clipboardText).catch(() => {});
+                }
+
+                setTimeout(() => {
+                    document.body.removeChild(iframe);
+                    btn.disabled = false;
+                    btn.classList.remove('sending');
+                    btn.textContent = 'Send Message';
+
+                    document.getElementById('modalTitle').textContent = 'Email Prepared!';
+                    document.getElementById('modalDesc').textContent =
+                        `Your message has been prepared. Your email client should open. If not, the message is copied to your clipboard — paste it into an email to samuelokikiola987@gmail.com`;
+                    const actionLink = document.getElementById('modalActionLink');
+                    actionLink.href = mailtoLink;
+                    actionLink.style.display = 'inline-flex';
+                    document.getElementById('modalActionLabel').textContent = 'Open Email';
+
+                    document.getElementById('contactForm').reset();
+                    setTimeout(toggleReachFields, 50);
+
+                    openModal();
+                }, 700);
+            }
+
+            return false;
+        }
+
+        // ── Intersection Observer for fade-in ──
+        const observerOptions = { threshold: 0.1, rootMargin: '0px 0px -50px 0px' };
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.service-card, .about-text, .about-visual, .contact-info, .contact-form-card, .gallery-header, .gallery-item')
+            .forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(30px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+
+        // ── WhatsApp float tooltip on mobile ──
+        const whatsappFloat = document.querySelector('.whatsapp-float');
+        if (whatsappFloat) {
+            whatsappFloat.addEventListener('touchstart', function() {
+                this.classList.add('tapped');
+            });
+            whatsappFloat.addEventListener('touchend', function() {
+                setTimeout(() => this.classList.remove('tapped'), 1000);
+            });
+        }
+    </script>
 
 </body>
 </html>
